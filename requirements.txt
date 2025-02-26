@@ -1,0 +1,15 @@
+requests>=2.31.0
+python-dateutil>=2.8.2
+urllib3>=2.0.7
+certifi>=2023.7.22
+charset-normalizer>=3.3.0
+idna>=3.4
+six>=1.16.0
+typing-extensions>=4.8.0
+dataclasses>=0.6; python_version < "3.7"
+pytest>=7.4.3  # for running tests
+pytest-cov>=4.1.0  # for test coverage reports
+black>=23.11.0  # for code formatting
+mypy>=1.7.0  # for type checking
+requests-mock>=1.11.0  # for testing HTTP requests
+python-dotenv>=1.0.0  # for environment variable management

@@ -1,0 +1,83 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Image Gallery</title>
+        <style>
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+            .image-card {
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .image-card img {
+                width: 100%;
+                height: 300px;
+                object-fit: cover;
+            }
+            .unsplash-attribution {
+                padding: 10px;
+                font-size: 0.9em;
+                color: #666;
+            }
+            .unsplash-attribution a {
+                color: #333;
+                text-decoration: none;
+            }
+            .unsplash-attribution a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="gallery">
+    
+            <div class="image-card">
+                <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTQ3Nzh8MHwxfHNlYXJjaHwxfHxuYXR1cmV8ZW58MHx8fHwxNzQwNTQyOTU5fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="Unsplash photo">
+                <div class="unsplash-attribution">
+            <p>
+                Photo by <a href="https://unsplash.com/@henry_be">Henry Be</a> on 
+                <a href="https://unsplash.com/photos/IicyiaPYGGI">Unsplash</a>
+            </p>
+        </div>
+            </div>
+        
+            <div class="image-card">
+                <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTQ3Nzh8MHwxfHNlYXJjaHwyfHxuYXR1cmV8ZW58MHx8fHwxNzQwNTQyOTU5fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="Finding my roots">
+                <div class="unsplash-attribution">
+            <p>
+                Photo by <a href="https://unsplash.com/@jeremybishop">Jeremy Bishop</a> on 
+                <a href="https://unsplash.com/photos/EwKXn5CapA4">Unsplash</a>
+            </p>
+        </div>
+            </div>
+        
+            <div class="image-card">
+                <img src="https://images.unsplash.com/photo-1529419412599-7bb870e11810?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTQ3Nzh8MHwxfHNlYXJjaHwzfHxuYXR1cmV8ZW58MHx8fHwxNzQwNTQyOTU5fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="Unsplash photo">
+                <div class="unsplash-attribution">
+            <p>
+                Photo by <a href="https://unsplash.com/@damiano_baschiera">Damiano Baschiera</a> on 
+                <a href="https://unsplash.com/photos/d4feocYfzAM">Unsplash</a>
+            </p>
+        </div>
+            </div>
+        
+            <div class="image-card">
+                <img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTQ3Nzh8MHwxfHNlYXJjaHw0fHxuYXR1cmV8ZW58MHx8fHwxNzQwNTQyOTU5fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="Unsplash photo">
+                <div class="unsplash-attribution">
+            <p>
+                Photo by <a href="https://unsplash.com/@kenrickmills">Kenrick Mills</a> on 
+                <a href="https://unsplash.com/photos/1h2Pg97SXfA">Unsplash</a>
+            </p>
+        </div>
+            </div>
+        
+        </div>
+    </body>
+    </html>
+    
