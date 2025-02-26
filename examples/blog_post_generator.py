@@ -12,11 +12,11 @@ from notunsplash import Unsplash
 
 def generate_blog_post(topic: str, num_images: int = 3):
     """Generate a sample blog post with Unsplash images and attribution"""
-    client = Unsplash(access_key="7jaFq17KqaXvGdtcvi0FZAIgtV0iEjxD9KHkUtaJ--I")
+    client = Unsplash(access_key="ACCESS_KEY_HERE")
     
     # Search for relevant photos
     search_results = client.search_photos(topic, per_page=num_images)
-    if not search_results["results"]:
+    if not search_results:
         return None
     
     # Generate markdown blog post
@@ -24,7 +24,7 @@ def generate_blog_post(topic: str, num_images: int = 3):
     post += f"_Created on {datetime.now().strftime('%B %d, %Y')}_\n\n"
     
     # Add photos with attribution
-    for i, photo in enumerate(search_results["results"], 1):
+    for i, photo in enumerate(search_results, 1):
         # Add photo description
         description = photo.description or f"Image {i}"
         post += f"## {description}\n\n"

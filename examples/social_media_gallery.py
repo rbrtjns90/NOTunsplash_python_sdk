@@ -11,11 +11,11 @@ from notunsplash import Unsplash
 
 def create_gallery(theme: str, num_images: int = 6):
     """Create a responsive image gallery with proper attribution"""
-    client = Unsplash(access_key="ACCES_KEY")
+    client = Unsplash(access_key="ACCESS-KEY-HERE")
     
     # Search for photos directly instead of using collections
     search_results = client.search_photos(theme, per_page=num_images)
-    if not search_results["results"]:
+    if not search_results:
         return None
     
     # Generate HTML gallery
@@ -60,7 +60,7 @@ def create_gallery(theme: str, num_images: int = 6):
     """
     
     # Add each photo with its attribution
-    for photo in search_results["results"]:
+    for photo in search_results:
         html += f"""
             <div class="image-card">
                 <img src="{photo.urls.regular}" alt="{photo.description or 'Unsplash photo'}">

@@ -51,3 +51,53 @@ Photo: https://unsplash.com/photos/{self.photo.id}"""
             "creation_time": self.photo.created_at.isoformat(),
             "attribution_generated": datetime.now().isoformat()
         }
+
+    @property
+    def html(self) -> str:
+        """Generate HTML attribution"""
+        return (
+            f'Photo by <a href="https://unsplash.com/@{self.photo.user.username}">'
+            f'{self.photo.user.name}</a> on '
+            f'<a href="https://unsplash.com">Unsplash</a>'
+        )
+    
+    @property
+    def markdown(self) -> str:
+        """Generate Markdown attribution"""
+        return (
+            f'Photo by [{self.photo.user.name}]'
+            f'(https://unsplash.com/@{self.photo.user.username}) on '
+            f'[Unsplash](https://unsplash.com)'
+        )
+    
+    @property
+    def rst(self) -> str:
+        """Generate reStructuredText attribution"""
+        return (
+            f'Photo by `{self.photo.user.name} '
+            f'<https://unsplash.com/@{self.photo.user.username}>`_ on '
+            f'`Unsplash <https://unsplash.com>`_'
+        )
+    
+    @property
+    def text(self) -> str:
+        """Generate plain text attribution"""
+        return (
+            f'Photo by {self.photo.user.name} '
+            f'(https://unsplash.com/@{self.photo.user.username}) on '
+            f'Unsplash (https://unsplash.com)'
+        )
+    
+    def to_dict(self) -> Dict:
+        """Convert attribution to dictionary format"""
+        return {
+            "photographer_name": self.photo.user.name,
+            "photographer_username": self.photo.user.username,
+            "photographer_url": f"https://unsplash.com/@{self.photo.user.username}",
+            "photo_url": f"https://unsplash.com/photos/{self.photo.id}",
+            "unsplash_url": "https://unsplash.com",
+            "html": self.html,
+            "markdown": self.markdown,
+            "rst": self.rst,
+            "text": self.text
+        }
