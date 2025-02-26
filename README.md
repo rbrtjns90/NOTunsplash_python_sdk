@@ -1,16 +1,16 @@
-# NotUnsplash Python SDK
+# NOTunsplash Python SDK
 
-A comprehensive Python library for interacting with the Unsplash API, featuring robust error handling, OAuth support, and proper attribution.
+A Python SDK for interacting with the Unsplash API, providing a clean and type-safe interface with comprehensive error handling and proper attribution support.
 
 ## Features
 
-- Full Unsplash API support
-- OAuth 2.0 authentication
-- Proper attribution handling (HTML, Markdown, reStructuredText)
-- 97% test coverage
-- Modern Python type hints
+- Complete Unsplash API integration
+- OAuth 2.0 authentication flow
+- Built-in attribution handling (HTML, Markdown, reStructuredText, Plain text)
+- Type hints for better IDE support
 - Comprehensive error handling
-- Easy to use models
+- Easy-to-use data models
+- Extensive test coverage
 
 ## Installation
 
@@ -18,51 +18,132 @@ A comprehensive Python library for interacting with the Unsplash API, featuring 
 pip install notunsplash
 ```
 
+## Requirements
+
+- Python 3.8 or higher
+- requests>=2.31.0
+- python-dateutil>=2.8.2
+- urllib3>=2.0.7
+
 ## Quick Start
 
 ```python
 from notunsplash import Unsplash
 
 # Initialize with your access key
-client = Unsplash(access_key="your-access-key")
+client = Unsplash(access_key="your_access_key")
 
 # Search for photos
-photos = client.search_photos("nature", per_page=10)
+photos = client.search_photos(
+    query="nature",    # Query is a required parameter
+    page=1,           # Optional: default is 1
+    per_page=10       # Optional: default is 10
+)
+
 for photo in photos:
-    print(f"Photo by {photo.user.name}: {photo.urls['regular']}")
-    # Get attribution
-    print(photo.attribution.html)  # HTML format
-    print(photo.attribution.markdown)  # Markdown format
+    # Access photo metadata
+    print(f"Photo by {photo.user.name}")
+    print(f"Description: {photo.description or 'No description'}")
+    print(f"URLs available: {photo.urls}")  # Dictionary of URLs
+    print(f"Regular size URL: {photo.urls['regular']}")
+    
+    # Get attribution in HTML format
+    print(photo.attribution.html)
 ```
 
 ## OAuth Authentication
 
 ```python
-# Initialize with both access key and secret key for OAuth
-client = Unsplash(
-    access_key="your-access-key",
-    secret_key="your-secret-key"
-)
+from notunsplash import Unsplash
+from notunsplash.errors import UnsplashAuthError
 
-# Generate authorization URL
-auth_url = client.get_oauth_url(
-    redirect_uri="your-redirect-uri",
-    scope=["public", "write_likes"]
-)
+try:
+    # Initialize with OAuth credentials
+    client = Unsplash(
+        access_key="your_access_key",
+        secret_key="your_secret_key"  # Required for OAuth
+    )
+    
+    # Generate authorization URL
+    auth_url = client.get_oauth_url(
+        redirect_uri="your_redirect_uri",
+        scope=["public", "write_likes"]  # Optional: defaults to ["public"]
+    )
+    print(f"Visit this URL to authorize: {auth_url}")
+    
+    # After user authorization, exchange code for token
+    token = client.get_oauth_token(
+        code="authorization_code",
+        redirect_uri="your_redirect_uri"  # Must match the original redirect_uri
+    )
+    
+    # Set token for authenticated requests
+    client.set_oauth_token(token["access_token"])
+    
+    # Now you can use authenticated endpoints
+    client.like_photo("photo_id")
+    
+except UnsplashAuthError as e:
+    print(f"Authentication error: {e}")
+```
 
-# Exchange code for access token
-token = client.get_oauth_token(
-    code="authorization-code",
-    redirect_uri="your-redirect-uri"
-)
+## Real World Examples
 
-# Set access token for authenticated requests
-client.set_oauth_token(token["access_token"])
+### Creating a Blog Header
+
+```python
+def create_blog_header(topic: str) -> str:
+    client = Unsplash(access_key="your_access_key")
+    
+    # Search for a photo
+    photos = client.search_photos(
+        query=topic,
+        per_page=1
+    )
+    
+    if not photos:
+        return "<p>No suitable images found.</p>"
+    
+    photo = photos[0]
+    
+    return f"""
+        <header class="blog-header">
+            <img src="{photo.urls['regular']}" 
+                 alt="{photo.description or photo.alt_description or 'Blog header image'}">
+            {photo.attribution.html}
+        </header>
+    """
+```
+
+### Creating a Social Media Gallery
+
+```python
+def create_social_gallery(theme: str, num_images: int = 6) -> str:
+    client = Unsplash(access_key="your_access_key")
+    
+    # Search for photos
+    photos = client.search_photos(
+        query=theme,
+        per_page=num_images
+    )
+    
+    # Generate HTML gallery
+    html = '<div class="gallery">'
+    for photo in photos:
+        html += f"""
+            <div class="image-card">
+                <img src="{photo.urls['regular']}" 
+                     alt="{photo.description or photo.alt_description or 'Gallery image'}">
+                {photo.attribution.html}
+            </div>
+        """
+    html += "</div>"
+    return html
 ```
 
 ## Attribution
 
-Proper attribution is required when using Unsplash photos. The SDK provides multiple attribution formats:
+Unsplash requires proper attribution for all photos. This SDK makes it easy with multiple attribution formats:
 
 ```python
 # Get a photo
@@ -85,60 +166,51 @@ print(photo.attribution.text)
 # Output: Photo by Photographer Name (https://unsplash.com/@photographer) on Unsplash (https://unsplash.com)
 ```
 
-## Models
+## Available Models
 
-The SDK provides rich models for Unsplash entities:
+The SDK provides rich models for all Unsplash entities:
 
-- `Photo`: Full photo metadata, URLs, and attribution
-- `User`: User profile information and statistics
-- `Collection`: Photo collection details
+- `Photo`: Complete photo metadata including URLs and attribution
+- `User`: User profile data and statistics
+- `Collection`: Photo collection metadata
 - `Topic`: Editorial topic information
 
 ## Error Handling
 
-The SDK provides comprehensive error handling:
+The SDK implements comprehensive error handling for all API interactions:
 
 ```python
-from notunsplash.errors import UnsplashAuthError
+from notunsplash.exceptions import UnsplashError, RateLimitError
 
 try:
-    # This requires authentication
-    client.like_photo("photo-id")
-except UnsplashAuthError as e:
-    print(f"Authentication error: {e}")
+    photo = client.get_photo("invalid-id")
+except RateLimitError:
+    print("Rate limit exceeded. Please wait before making more requests.")
+except UnsplashError as e:
+    print(f"An error occurred: {e}")
 ```
 
 ## Development
 
-### Requirements
-
-- Python 3.8+
-- pytest for testing
-- requests for HTTP
-- python-dateutil for date parsing
-
-### Testing
-
-The SDK has comprehensive test coverage (97%):
+To set up the development environment:
 
 ```bash
-# Run tests with coverage
-pytest tests/ -v --cov=notunsplash
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Current test status:
-# 22 tests passing
-# 97% code coverage
+# Install development dependencies
+pip install -r requirements-dev.txt
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## Author
 
-- [Unsplash](https://unsplash.com) for their amazing API
-- All the photographers who share their work on Unsplash
+Robert Jones
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
