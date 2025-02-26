@@ -1,103 +1,46 @@
-"""
-Attribution handling for Unsplash photos
-"""
-from typing import Dict, Optional
-from datetime import datetime
+"""Attribution module for Unsplash photos"""
 
 class Attribution:
-    """Handles attribution requirements for Unsplash photos"""
-    
+    """Class to handle photo attribution in various formats"""
     def __init__(self, photo):
-        """Initialize attribution with a photo object"""
         self.photo = photo
-    
-    def get_html(self, css_class: Optional[str] = "unsplash-attribution") -> str:
-        """Generate HTML attribution"""
-        css_class_attr = f' class="{css_class}"' if css_class else ''
-        return f"""
-        <div{css_class_attr}>
-            <p>
-                Photo by <a href="https://unsplash.com/@{self.photo.user.username}">{self.photo.user.name}</a> on 
-                <a href="https://unsplash.com/photos/{self.photo.id}">Unsplash</a>
-            </p>
-        </div>
-        """.strip()
-    
-    def get_text(self) -> str:
-        """Generate plain text attribution"""
-        return f"""Photo by {self.photo.user.name} on Unsplash
-Photographer: https://unsplash.com/@{self.photo.user.username}
-Photo: https://unsplash.com/photos/{self.photo.id}"""
-    
-    def get_markdown(self) -> str:
-        """Generate markdown attribution"""
-        return f"Photo by [{self.photo.user.name}](https://unsplash.com/@{self.photo.user.username}) on [Unsplash](https://unsplash.com/photos/{self.photo.id})"
-    
-    def get_rst(self) -> str:
-        """Generate reStructuredText attribution"""
-        return f"Photo by `{self.photo.user.name} <https://unsplash.com/@{self.photo.user.username}>`_ on `Unsplash <https://unsplash.com/photos/{self.photo.id}>`_"
-    
-    @property
-    def metadata(self) -> Dict:
-        """Get complete metadata about the photo and attribution"""
-        return {
-            "photo_id": self.photo.id,
-            "photographer_name": self.photo.user.name,
-            "photographer_username": self.photo.user.username,
-            "photographer_url": f"https://unsplash.com/@{self.photo.user.username}",
-            "photo_url": f"https://unsplash.com/photos/{self.photo.id}",
-            "description": self.photo.description,
-            "unsplash_url": "https://unsplash.com",
-            "creation_time": self.photo.created_at.isoformat(),
-            "attribution_generated": datetime.now().isoformat()
-        }
 
     @property
-    def html(self) -> str:
-        """Generate HTML attribution"""
+    def html(self):
+        """Return HTML format attribution"""
         return (
-            f'Photo by <a href="https://unsplash.com/@{self.photo.user.username}">'
-            f'{self.photo.user.name}</a> on '
-            f'<a href="https://unsplash.com">Unsplash</a>'
+            f'Photo by <a href="{self.photo.user.html_link}">{self.photo.user.name}</a> '
+            f'on <a href="https://unsplash.com">Unsplash</a>'
         )
-    
+
     @property
-    def markdown(self) -> str:
-        """Generate Markdown attribution"""
+    def markdown(self):
+        """Return Markdown format attribution"""
         return (
-            f'Photo by [{self.photo.user.name}]'
-            f'(https://unsplash.com/@{self.photo.user.username}) on '
-            f'[Unsplash](https://unsplash.com)'
+            f'Photo by [{self.photo.user.name}]({self.photo.user.html_link}) '
+            f'on [Unsplash](https://unsplash.com)'
         )
-    
+
     @property
-    def rst(self) -> str:
-        """Generate reStructuredText attribution"""
+    def rst(self):
+        """Return reStructuredText format attribution"""
         return (
-            f'Photo by `{self.photo.user.name} '
-            f'<https://unsplash.com/@{self.photo.user.username}>`_ on '
-            f'`Unsplash <https://unsplash.com>`_'
+            f'Photo by `{self.photo.user.name} <{self.photo.user.html_link}>`_ '
+            f'on `Unsplash <https://unsplash.com>`_'
         )
-    
+
     @property
-    def text(self) -> str:
-        """Generate plain text attribution"""
+    def text(self):
+        """Return plain text format attribution"""
         return (
-            f'Photo by {self.photo.user.name} '
-            f'(https://unsplash.com/@{self.photo.user.username}) on '
-            f'Unsplash (https://unsplash.com)'
+            f'Photo by {self.photo.user.name} ({self.photo.user.html_link}) '
+            f'on Unsplash (https://unsplash.com)'
         )
-    
-    def to_dict(self) -> Dict:
-        """Convert attribution to dictionary format"""
+
+    @property
+    def dict(self):
+        """Return dictionary format attribution"""
         return {
-            "photographer_name": self.photo.user.name,
-            "photographer_username": self.photo.user.username,
-            "photographer_url": f"https://unsplash.com/@{self.photo.user.username}",
-            "photo_url": f"https://unsplash.com/photos/{self.photo.id}",
-            "unsplash_url": "https://unsplash.com",
-            "html": self.html,
-            "markdown": self.markdown,
-            "rst": self.rst,
-            "text": self.text
+            "name": self.photo.user.name,
+            "url": self.photo.user.html_link
         }

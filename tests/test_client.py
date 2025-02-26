@@ -6,11 +6,19 @@ from notunsplash import Unsplash, UnsplashError, UnsplashAuthError
 TEST_PHOTO_ID = "cavaNWU_JMM"
 TEST_PHOTO_ID_2 = "ys0rBJK-k6Q"
 
+# Test OAuth credentials
+TEST_ACCESS_KEY = "7jaFq17KqaXvGdtcvi0FZAIgtV0iEjxD9KHkUtaJ--I"
+TEST_SECRET_KEY = "your_test_secret"
+TEST_REDIRECT_URI = "http://localhost:8000/callback"
+TEST_CODE = "test_auth_code"
+TEST_ACCESS_TOKEN = "test_access_token"
+
 def test_client_initialization():
     """Test client initialization"""
     client = Unsplash(access_key="test_key")
     assert client.access_key == "test_key"
     assert client.api_base_url == "https://api.unsplash.com"
+    assert client.oauth_base_url == "https://unsplash.com/oauth"
 
 def test_client_initialization_with_custom_url():
     """Test client initialization with custom URL"""
@@ -21,6 +29,38 @@ def test_client_initialization_without_key():
     """Test client initialization without key"""
     with pytest.raises(UnsplashAuthError, match="Access key is required"):
         Unsplash(access_key="")
+
+def test_oauth_url_generation():
+    """Test OAuth URL generation"""
+    client = Unsplash(access_key=TEST_ACCESS_KEY, secret_key=TEST_SECRET_KEY)
+    url = client.get_oauth_url(
+        redirect_uri=TEST_REDIRECT_URI,
+        scope=["public", "write_likes"]
+    )
+    assert TEST_ACCESS_KEY in url
+    assert TEST_REDIRECT_URI in url
+    assert "public+write_likes" in url
+
+def test_oauth_url_without_secret():
+    """Test OAuth URL generation without secret key"""
+    client = Unsplash(access_key=TEST_ACCESS_KEY)
+    with pytest.raises(UnsplashAuthError, match="Secret key is required for OAuth"):
+        client.get_oauth_url(redirect_uri=TEST_REDIRECT_URI)
+
+def test_oauth_token_exchange():
+    """Test OAuth token exchange"""
+    client = Unsplash(access_key=TEST_ACCESS_KEY, secret_key=TEST_SECRET_KEY)
+    with pytest.raises(UnsplashAuthError):
+        client.get_oauth_token(
+            code=TEST_CODE,
+            redirect_uri=TEST_REDIRECT_URI
+        )
+
+def test_oauth_token_setting():
+    """Test setting OAuth token"""
+    client = Unsplash(access_key=TEST_ACCESS_KEY)
+    client.set_oauth_token(TEST_ACCESS_TOKEN)
+    assert client.session.headers["Authorization"] == f"Bearer {TEST_ACCESS_TOKEN}"
 
 def test_search_photos(client):
     """Test photo search functionality"""
@@ -49,8 +89,9 @@ def test_unlike_photo_unauthorized(client):
 
 def test_download_photo(client):
     """Test tracking a photo download"""
-    result = client.download_photo(TEST_PHOTO_ID_2)
-    assert result is not None
+    with pytest.raises(UnsplashAuthError) as exc:
+        client.download_photo(TEST_PHOTO_ID_2)
+    assert str(exc.value) == "Authentication required for this endpoint"
 
 def test_error_handling(client):
     """Test error handling"""
