@@ -16,6 +16,14 @@ def create_social_gallery(theme: str, num_images: int = 6) -> str:
             per_page=num_images
         )
         
+        # Track usage for each photo asynchronously
+        for photo in photos:
+            try:
+                client.download_photo(photo.id)
+            except Exception as e:
+                # Log the error but don't fail the whole request
+                print(f"Warning: Failed to track usage for photo {photo.id}: {e}")
+        
         # Create a complete HTML page with responsive grid
         return f"""<!DOCTYPE html>
 <html>
@@ -65,8 +73,13 @@ def create_social_gallery(theme: str, num_images: int = 6) -> str:
     <div class="gallery">
         {"".join(f'''
         <div class="image-card">
-            <img src="{photo.urls['regular']}" 
-                 alt="{photo.description or photo.alt_description or 'Gallery image'}">
+            <picture>
+                <source media="(min-width: 1080px)" srcset="{photo.urls['regular']}">
+                <source media="(min-width: 400px)" srcset="{photo.urls['small']}">
+                <img src="{photo.urls['thumb']}" 
+                     alt="{photo.description or photo.alt_description or 'Gallery image'}"
+                     loading="lazy">
+            </picture>
             <div class="attribution">
                 {photo.attribution.html}
             </div>

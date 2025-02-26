@@ -30,9 +30,16 @@ class Unsplash:
             "Authorization": f"Client-ID {access_key}"
         })
 
-    def _request(self, method: str, endpoint: str, **kwargs) -> Dict:
-        """Make a request to the Unsplash API"""
-        url = f"{self.api_base_url}/{endpoint.lstrip('/')}"
+    def _request(self, method: str, endpoint: str, use_absolute_url: bool = False, **kwargs) -> Dict:
+        """Make a request to the Unsplash API
+        
+        Args:
+            method: HTTP method to use
+            endpoint: API endpoint or full URL if use_absolute_url is True
+            use_absolute_url: If True, use endpoint as the full URL instead of joining with base URL
+            **kwargs: Additional arguments to pass to requests
+        """
+        url = endpoint if use_absolute_url else f"{self.api_base_url}/{endpoint.lstrip('/')}"
         
         # Headers are already set in the session
         response = self.session.request(method, url, **kwargs)
@@ -130,5 +137,28 @@ class Unsplash:
             raise
 
     def download_photo(self, photo_id: str) -> Dict:
-        """Track a photo download"""
-        return self._request("GET", f"/photos/{photo_id}/download")
+        """Track a photo download by triggering the download endpoint.
+        
+        This should be called whenever a user performs an action similar to downloading,
+        such as:
+        - Setting an image as a header
+        - Inserting an image into a blog post
+        - Using the image in a presentation
+        - Any other action where the photo is being used
+        
+        Args:
+            photo_id: The ID of the photo being downloaded/used
+            
+        Returns:
+            Dict containing the download tracking response
+            
+        Note:
+            This is an event endpoint used to increment download counts.
+            It should NOT be used to get the photo URL for embedding (use photo.urls instead).
+        """
+        photo = self.get_photo(photo_id)
+        if not photo.download_location:
+            raise UnsplashError("Download location not available for this photo")
+            
+        # The download_location URL already includes necessary parameters
+        return self._request("GET", photo.download_location, use_absolute_url=True)
