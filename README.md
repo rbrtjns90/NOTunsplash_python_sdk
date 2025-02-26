@@ -27,6 +27,8 @@ pip install notunsplash
 
 ## Quick Start
 
+Basic usage of the SDK to search for photos:
+
 ```python
 from notunsplash import Unsplash
 
@@ -41,17 +43,18 @@ photos = client.search_photos(
 )
 
 for photo in photos:
-    # Access photo metadata
     print(f"Photo by {photo.user.name}")
     print(f"Description: {photo.description or 'No description'}")
     print(f"URLs available: {photo.urls}")  # Dictionary of URLs
     print(f"Regular size URL: {photo.urls['regular']}")
-    
-    # Get attribution in HTML format
-    print(photo.attribution.html)
+    print(f"Attribution: {photo.attribution.html}")
 ```
 
+For a complete working example, see [examples/quickstart.py](examples/quickstart.py).
+
 ## OAuth Authentication
+
+Example of implementing OAuth authentication flow:
 
 ```python
 from notunsplash import Unsplash
@@ -87,9 +90,13 @@ except UnsplashAuthError as e:
     print(f"Authentication error: {e}")
 ```
 
+For a complete working example with interactive OAuth flow, see [examples/oauth_example.py](examples/oauth_example.py).
+
 ## Real World Examples
 
 ### Creating a Blog Header
+
+Create a responsive blog header with proper attribution:
 
 ```python
 def create_blog_header(topic: str) -> str:
@@ -110,12 +117,18 @@ def create_blog_header(topic: str) -> str:
         <header class="blog-header">
             <img src="{photo.urls['regular']}" 
                  alt="{photo.description or photo.alt_description or 'Blog header image'}">
-            {photo.attribution.html}
+            <div class="attribution">
+                {photo.attribution.html}
+            </div>
         </header>
     """
 ```
 
+For a complete working example with responsive styling, see [examples/blog_header.py](examples/blog_header.py).
+
 ### Creating a Social Media Gallery
+
+Create a responsive image gallery for social media:
 
 ```python
 def create_social_gallery(theme: str, num_images: int = 6) -> str:
@@ -134,12 +147,16 @@ def create_social_gallery(theme: str, num_images: int = 6) -> str:
             <div class="image-card">
                 <img src="{photo.urls['regular']}" 
                      alt="{photo.description or photo.alt_description or 'Gallery image'}">
-                {photo.attribution.html}
+                <div class="attribution">
+                    {photo.attribution.html}
+                </div>
             </div>
         """
     html += "</div>"
     return html
 ```
+
+For a complete working example with responsive grid layout, see [examples/social_gallery.py](examples/social_gallery.py).
 
 ## Attribution
 
