@@ -3,6 +3,7 @@ Quick start example showing basic usage of the NOTunsplash SDK
 """
 import os
 from notunsplash import Unsplash
+from notunsplash.errors import UnsplashError, UnsplashAuthError
 
 def main():
     # Get access key from environment variable
@@ -11,10 +12,10 @@ def main():
         print("Please set UNSPLASH_ACCESS_KEY environment variable")
         return
 
-    # Initialize client
-    client = Unsplash(access_key=access_key)
-
     try:
+        # Initialize client
+        client = Unsplash(access_key=access_key)
+
         # Search for photos
         photos = client.search_photos(
             query="nature",    # Query is a required parameter
@@ -31,8 +32,10 @@ def main():
             print(f"Attribution: {photo.attribution.html}")
             print("-" * 80 + "\n")
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except UnsplashAuthError as e:
+        print(f"Authentication error: {e}")
+    except UnsplashError as e:
+        print(f"API error: {e}")
 
 if __name__ == "__main__":
     main()

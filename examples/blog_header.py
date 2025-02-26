@@ -3,24 +3,26 @@ Example of creating a blog header with NOTunsplash SDK
 """
 import os
 from notunsplash import Unsplash
+from notunsplash.errors import UnsplashError, UnsplashAuthError
 
 def create_blog_header(topic: str) -> str:
     """Create a blog header with a photo and proper attribution"""
-    client = Unsplash(access_key=os.getenv("UNSPLASH_ACCESS_KEY"))
-    
-    # Search for a photo
-    photos = client.search_photos(
-        query=topic,
-        per_page=1
-    )
-    
-    if not photos:
-        return "<p>No suitable images found.</p>"
-    
-    photo = photos[0]
-    
-    # Create a header with responsive image and attribution
-    return f"""<!DOCTYPE html>
+    try:
+        client = Unsplash(access_key=os.getenv("UNSPLASH_ACCESS_KEY"))
+        
+        # Search for a photo
+        photos = client.search_photos(
+            query=topic,
+            per_page=1
+        )
+        
+        if not photos:
+            return "<p>No suitable images found.</p>"
+        
+        photo = photos[0]
+        
+        # Create a header with responsive image and attribution
+        return f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -66,6 +68,10 @@ def create_blog_header(topic: str) -> str:
     </header>
 </body>
 </html>"""
+    except UnsplashAuthError as e:
+        return f"<p>Authentication error: {e}</p>"
+    except UnsplashError as e:
+        return f"<p>API error: {e}</p>"
 
 def main():
     # Get access key from environment variable

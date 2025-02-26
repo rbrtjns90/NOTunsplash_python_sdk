@@ -3,19 +3,21 @@ Example of creating a social media gallery with NOTunsplash SDK
 """
 import os
 from notunsplash import Unsplash
+from notunsplash.errors import UnsplashError, UnsplashAuthError
 
 def create_social_gallery(theme: str, num_images: int = 6) -> str:
     """Create a responsive image gallery with proper attribution"""
-    client = Unsplash(access_key=os.getenv("UNSPLASH_ACCESS_KEY"))
-    
-    # Search for photos
-    photos = client.search_photos(
-        query=theme,
-        per_page=num_images
-    )
-    
-    # Create a complete HTML page with responsive grid
-    return f"""<!DOCTYPE html>
+    try:
+        client = Unsplash(access_key=os.getenv("UNSPLASH_ACCESS_KEY"))
+        
+        # Search for photos
+        photos = client.search_photos(
+            query=theme,
+            per_page=num_images
+        )
+        
+        # Create a complete HTML page with responsive grid
+        return f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -71,6 +73,20 @@ def create_social_gallery(theme: str, num_images: int = 6) -> str:
         </div>
         ''' for photo in photos)}
     </div>
+</body>
+</html>"""
+    except UnsplashAuthError as e:
+        return f"""<!DOCTYPE html>
+<html>
+<body>
+    <p>Authentication error: {e}</p>
+</body>
+</html>"""
+    except UnsplashError as e:
+        return f"""<!DOCTYPE html>
+<html>
+<body>
+    <p>API error: {e}</p>
 </body>
 </html>"""
 

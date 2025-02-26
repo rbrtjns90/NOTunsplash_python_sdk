@@ -194,18 +194,34 @@ The SDK provides rich models for all Unsplash entities:
 
 ## Error Handling
 
-The SDK implements comprehensive error handling for all API interactions:
+The SDK provides two types of exceptions for error handling:
 
 ```python
-from notunsplash.exceptions import UnsplashError, RateLimitError
+from notunsplash import Unsplash
+from notunsplash.errors import UnsplashError, UnsplashAuthError
+
+client = Unsplash(access_key="your_access_key")
 
 try:
+    # Example of general error handling
     photo = client.get_photo("invalid-id")
-except RateLimitError:
-    print("Rate limit exceeded. Please wait before making more requests.")
+except UnsplashAuthError as e:
+    print(f"Authentication error: {e}")  # Handles authentication-specific errors
 except UnsplashError as e:
-    print(f"An error occurred: {e}")
+    print(f"API error: {e}")  # Handles all other API errors
+
+# Example of OAuth-specific error handling
+try:
+    client.like_photo("photo-id")
+except UnsplashAuthError as e:
+    print(f"Authentication required: {e}")
+except UnsplashError as e:
+    print(f"API error: {e}")
 ```
+
+The SDK uses two main exception types:
+- `UnsplashAuthError`: Raised for authentication-related errors (invalid API key, missing OAuth token, etc.)
+- `UnsplashError`: Base exception class for all other API errors (rate limits, invalid requests, server errors, etc.)
 
 ## Development
 
