@@ -21,6 +21,13 @@ def create_blog_header(topic: str) -> str:
         
         photo = photos[0]
         
+        # Track the photo usage asynchronously
+        try:
+            client.download_photo(photo.id)
+        except Exception as e:
+            # Log the error but don't fail the whole request
+            print(f"Warning: Failed to track photo usage: {e}")
+        
         # Create a header with responsive image and attribution
         return f"""<!DOCTYPE html>
 <html>
@@ -60,8 +67,13 @@ def create_blog_header(topic: str) -> str:
 </head>
 <body>
     <header class="blog-header">
-        <img src="{photo.urls['regular']}" 
-             alt="{photo.description or photo.alt_description or 'Blog header image'}">
+        <picture>
+            <source media="(min-width: 1080px)" srcset="{photo.urls['regular']}">
+            <source media="(min-width: 400px)" srcset="{photo.urls['small']}">
+            <img src="{photo.urls['thumb']}" 
+                 alt="{photo.description or photo.alt_description or 'Blog header image'}"
+                 loading="lazy">
+        </picture>
         <div class="attribution">
             {photo.attribution.html}
         </div>

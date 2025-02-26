@@ -64,6 +64,7 @@ class Photo:
         links = data.get("links", {})
         self.html_link = links.get("html")
         self.download_link = links.get("download")
+        self.download_location = links.get("download_location")  # Add download_location for tracking
         
         # User info
         user_data = data.get("user", {})
