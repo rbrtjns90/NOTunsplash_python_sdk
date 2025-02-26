@@ -10,7 +10,6 @@ A Python SDK for interacting with the Unsplash API, providing a clean and type-s
 - Type hints for better IDE support
 - Comprehensive error handling
 - Easy-to-use data models
-- Extensive test coverage
 
 ## Installation
 
