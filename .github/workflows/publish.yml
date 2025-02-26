@@ -1,0 +1,99 @@
+name: Publish Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+        pip install -e .
+        
+    - name: Run tests
+      run: |
+        pytest tests/ --cov=notunsplash
+
+  build-and-publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/notunsplash
+    permissions:
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine wheel setuptools
+        
+    - name: Verify version matches tag
+      run: |
+        # Extract version from setup.py
+        VERSION=$(python setup.py --version)
+        # Remove 'v' prefix from git tag if present
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        TAG_VERSION=${TAG_VERSION#refs/tags/}
+        
+        if [ "$VERSION" != "$TAG_VERSION" ]; then
+          echo "Version mismatch: setup.py version ($VERSION) does not match git tag ($TAG_VERSION)"
+          exit 1
+        fi
+        
+    - name: Build package
+      run: |
+        python -m build
+        twine check dist/*
+        
+    - name: Publish to Test PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
+        
+    - name: Test install from Test PyPI
+      run: |
+        python -m pip install --index-url https://test.pypi.org/simple/ --no-deps notunsplash
+        
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+        body: |
+          # NotUnsplash Python SDK ${{ github.ref_name }}
+          
+          ## Installation
+          ```bash
+          pip install notunsplash==${{ github.ref_name }}
+          ```
+          
+          See [README.md](README.md) for full documentation.
+        draft: false
+        prerelease: false
